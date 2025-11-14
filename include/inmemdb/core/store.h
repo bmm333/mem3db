@@ -10,13 +10,11 @@ public:
         Store(std::unique_ptr<IStorageBackend>backend,
         std::unique_ptr<IPersistenceEngine> presistence=nullptr);
         ~Store();
-
         //Def Public Api 
         void put(const char*key,const char* value);
         const char* get(const chr* key)const;
         bool contains(const char* key)const;
         void remove(const char* key);
-
         //Metadata
         size_t size()const;
         size_t capacity()const;
@@ -28,5 +26,4 @@ private:
             std::unique_ptr<IPersistenceEngine> presistence_;
             mutable std::shared_mutex mutex_; //rd/wr lock
 };
-
 } //namespace inmemdb

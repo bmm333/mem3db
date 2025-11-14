@@ -11,7 +11,6 @@ namespace inmemdb{
             HashTableBackend(const HashTableBackend)=delete;
             HashTableBackend& operator=(const HashTableBackend&)=delete;
             //istoragebackend interface
-
             void put(const char* key,const char* values)override;
             const char* get(const char* key)const override;
             bool contains(const char* key)const override;
@@ -20,7 +19,6 @@ namespace inmemdb{
             size_t size() const override{return size_;}
             size_t capacity() const override{return capacity_;}
             void foreach(void(*callback)(const char* key,const char* value,void* ctx),void* ctx)const override;
-        
         private:
             struct Entry{
                 char key[64];
@@ -28,7 +26,6 @@ namespace inmemdb{
                 uint64_t hash;
                 bool occupied;
                 Entry();
-
             }__attribute__((aligned(64))); //cache line alignment
             Entry* table_;
             size_t capacity_;
