@@ -9,7 +9,7 @@ namespace inmemdb{
     {
         inline_key[0]='\0';
         inline_value[0]='\0';
-    }
+    } // TODO: Canonical zeroing in constructor!!
 
     //Entry destructor
     HashTableBackend::Entry::~Entry(){
