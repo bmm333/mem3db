@@ -18,7 +18,7 @@ namespace inmemdb{
     ProbingStrategy probing = ProbingStrategy::LINEAR;
 };
 
-class HashTableBackend : public StorageBackend{
+class HashTableBackend : public IStorageBackend{
 public:
         explicit HashTableBackend(const HashTableConfig& config={});
         ~HashTableBackend()override;
