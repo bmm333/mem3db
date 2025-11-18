@@ -77,6 +77,23 @@ namespace inmemdb{
                 return (hash + attempt) % capacity_;
         }
     }
+    size_t HashTableBackend::probe_index(uint64_t hash, size_t attempt) const noexcept {
+        switch (config_.probing) {
+            case ProbingStrategy::LINEAR:
+                return (hash + attempt) % capacity_;
+            
+            case ProbingStrategy::QUADRATIC:
+                return (hash + attempt * attempt) % capacity_;
+            
+            case ProbingStrategy::DOUBLE_HASH: {
+                uint64_t hash2 = 1 + (hash % (capacity_ - 1));
+                return (hash + attempt * hash2) % capacity_;
+            }
+            
+            default:
+                return (hash + attempt) % capacity_;
+        }
+    }
     //Slot for lookup , Tombestone supported
     size_t HashTableBackend::find_slot(const char* key,uint64_t hash)const noexcept{
         size_t attempt=0;
@@ -182,31 +199,32 @@ namespace inmemdb{
     }
 
     //put op
-    void HashTableBackend::put(const char*key, const char* value)
-    {
-        if(!key||!value)
-        {
-            throw std::invalid_argument("key and value can be null");
+    void HashTableBackend::put(const char* key, const char* value) {
+        if (!key || !value) {
+            throw std::invalid_argument("key and value cannot be null");
         }
-        //if load factor exceeded resize
+        
         if (static_cast<double>(size_ + 1) / capacity_ > config_.max_load_factor) {
             resize();
         }
+        
         uint64_t hash = hash_function(key);
-        size_t index = find_slot_for_insert(hash);
-        //key already exist so update
-        if(index<capacity_)
-        {
-            set_entry(table_[index],key,value);
+        
+        // Check if key already exists
+        size_t index = find_slot(key, hash);
+        if (index < capacity_) {
+            // Update existing
+            set_entry(table_[index], key, value);
             return;
         }
-        //find slot for nwe key
-        index=find_slot_for_insert(hash);
-        if(index>=capacity_)
-        {
-            throw std::runtime_error("HashTable is full, cannot insert new key");
+        
+        // Find slot for new key
+        index = find_slot_for_insert(hash);
+        if (index >= capacity_) {
+            throw std::runtime_error("hash table full");
         }
-        set_entry(table_[index],key,value);
+        
+        set_entry(table_[index], key, value);
         ++size_;
     }
     //get op
