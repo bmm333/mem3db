@@ -9,13 +9,12 @@ namespace inmemdb{
         double max_load_factor = 0.75;
         size_t inline_key_threshold = 56;
         size_t inline_value_threshold = 56;
-    };
-    enum ProbingStrategy{
-        LINEAR,
-        QUADRATIC,
-        DOUBLE_HASH
-    };
-    ProbingStrategy probing = ProbingStrategy::LINEAR;
+        enum ProbingStrategy{
+            LINEAR,
+            QUADRATIC,
+            DOUBLE_HASH
+        };
+        ProbingStrategy probing = ProbingStrategy::LINEAR;
 };
 
 class HashTableBackend : public IStorageBackend{
@@ -31,7 +30,7 @@ public:
         //IstorageBackend interface
         void put(const char* key,const char* value)override;
         const char* get(const char* key) const override;
-        bool contains(const char* key)cosnt override;
+        bool contains(const char* key)const override;
         void remove(const char* key) override;
 
         size_t size() const override{return size_;}
@@ -114,4 +113,5 @@ private:
         void set_entry(Entry& entry,const char* key,const char* value);
         void clear_entry(Entry& entry) noexcept;
         
+    };
 }

@@ -7,4 +7,4 @@ What ive built till now is too cpu centric, will bring it to life just to benchm
     -fixed size keys/values for now but variabile later once i figure out a sane arena strategy.
     -everything in batches no small ops.
     -Cpu will act as the VRAM DataResident Manager
- 
+ Tested it out today, it was way slower than i thought , and its okay , was doing only 0.02m operations/sec , faster than std::unordered_map but nowhere near a inmemdb :D. 

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <new>
+#include <stdexcept>
 
 namespace inmemdb{
     //Entry constructor
@@ -54,14 +55,15 @@ namespace inmemdb{
         }
     }
     //FNV-1a hash function , surley this is going to be replaced later for gpu friendly.
-    uint64_t HashTableBackend::hash_function(const char* key)const noexcept{
-        uint64_t hash=14695981039346656037ULL;
-        while(*key){
-            hash^=static_cast<uint64_t>(*key++);
-            hash*=1099511628211ULL;
+    uint64_t HashTableBackend::hash_function(const char* key) const noexcept {
+        uint64_t hash = 14695981039346656037ULL;
+        while (*key) {
+            hash ^= static_cast<uint64_t>(*key++);
+            hash *= 1099511628211ULL;
         }
-        return hash?hash:1; //Avoiding zero hash
-        //prob strateg 
+        return hash ? hash : 1;
+    }
+    size_t HashTableBackend::probe_index(uint64_t hash, size_t attempt) const noexcept {
         switch (config_.probing) {
             case HashTableConfig::ProbingStrategy::LINEAR:
                 return (hash + attempt) % capacity_;
@@ -69,23 +71,7 @@ namespace inmemdb{
             case HashTableConfig::ProbingStrategy::QUADRATIC:
                 return (hash + attempt * attempt) % capacity_;
             
-            case HashTableConfig::ProbingStrategy::DOUBLE_HASH: {
-                uint64_t hash2 = 1 + (hash % (capacity_ - 1));
-                return (hash + attempt * hash2) % capacity_;
-            }
-            default:
-                return (hash + attempt) % capacity_;
-        }
-    }
-    size_t HashTableBackend::probe_index(uint64_t hash, size_t attempt) const noexcept {
-        switch (config_.probing) {
-            case ProbingStrategy::LINEAR:
-                return (hash + attempt) % capacity_;
-            
-            case ProbingStrategy::QUADRATIC:
-                return (hash + attempt * attempt) % capacity_;
-            
-            case ProbingStrategy::DOUBLE_HASH: {
+            case HashTableConfig::ProbingStrategy::DOUBLE_HASH: { 
                 uint64_t hash2 = 1 + (hash % (capacity_ - 1));
                 return (hash + attempt * hash2) % capacity_;
             }

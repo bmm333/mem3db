@@ -2,6 +2,9 @@
 #include <iostream>
 #include <chrono>
 
+using inmemdb::HashTableBackend;
+using inmemdb::HashTableConfig;
+
 int main()
 {
     HashTableConfig config;
@@ -10,8 +13,8 @@ int main()
     //basic testing
     backend.put("name","Ben");
     backend.put("age","22");
-    std::cout<<"name":<<backend.get("name")<<std::endl;
-    std::cout<<"age":<<backend.get("age")<<std::endl;
+    std::cout<<"name"<<backend.get("name")<<std::endl;
+    std::cout<<"age"<<backend.get("age")<<std::endl;
     //Benchmarking
     auto start=std::chrono::high_resolution_clock::now();
     for (int i = 0; i < 1000000; ++i) {
