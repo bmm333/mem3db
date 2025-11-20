@@ -8,3 +8,9 @@ What ive built till now is too cpu centric, will bring it to life just to benchm
     -everything in batches no small ops.
     -Cpu will act as the VRAM DataResident Manager
  Tested it out today, it was way slower than i thought , and its okay , was doing only 0.02m operations/sec , faster than std::unordered_map but nowhere near a inmemdb :D
+
+ --Device_context.h
+    |
+    --> Simple gpu dynamic selection querying all avalible gpus with cudaGetDeviceCount and cudaMemGetInfo
+    picking the device with most free vram (opt can maintain a gpu ranking table to switch devices in O(1) in case a larger batch wont fit). Singletone : Single deviceContext per process is fine for now , and thread safe access to steams and device info.
+
