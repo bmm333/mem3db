@@ -14,3 +14,8 @@ What ive built till now is too cpu centric, will bring it to life just to benchm
     --> Simple gpu dynamic selection querying all avalible gpus with cudaGetDeviceCount and cudaMemGetInfo
     picking the device with most free vram (opt can maintain a gpu ranking table to switch devices in O(1) in case a larger batch wont fit). Singletone : Single deviceContext per process is fine for now , and thread safe access to steams and device info.
 
+layout.cu -> assuming calls will succed , need's a wrapper for checking correctly likley : CUDA_CHECK(cudaMalloc....) with a fallback path(cpu mode) if gpu fails. 
+
+right now now thread safe even though gpu kernels run in streams , host side allocator must be protected. 
+
+Goals for now : 0 Fragmentations.
