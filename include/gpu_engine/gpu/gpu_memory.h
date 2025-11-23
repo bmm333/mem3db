@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "device_context.h"
 
+ 
 
 //small helper macro for cuda error checking
 #define CUDA_CHECK(expr)                                       \
