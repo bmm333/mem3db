@@ -8,7 +8,6 @@
 #include <atomic>
 #include <algorithm>
 #include "device_context.h"
-
  
 
 //small helper macro for cuda error checking
