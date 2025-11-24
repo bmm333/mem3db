@@ -33,7 +33,7 @@ struct SoALayout{
     uint32_t max_probes;
     uint32_t batch_size; //kernel batch size;
 
-    //utility / cheap bitmask index
+    //utility - cheap bitmask index
     __host__ __device__
     size_t index(uint64_t hash)const noexcept{
         return hash & mask;
