@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+#include <cuda_runtime.h>
 
 //Layout constants
 
@@ -15,10 +16,10 @@ enum EntryFlag:uint8_t{
     TOMBSTONE=2,
 };
 //gpu alignment rules
-static constexpr size_t ALIGNMENT=128; //matching key size &^gpu l2 line
+static constexpr size_t ALIGNMENT=128; //matching key size & gpu l2 line
 
 //SoA table POD describing mem layout
-
+//must remain pod for cudaMemcpy and __device__ access
 struct SoALayout{
     //Column buffers in GPU VRAM (device pointers)
     uint8_t* keys; //[capacity* key_size]
@@ -28,13 +29,22 @@ struct SoALayout{
     //MetaData
     size_t capacity; //power of 2
     size_t mask; //capacity-1
-    //Probe settings (Used y GPU kernels)
+    //Probe settings (Used by GPU kernels)
     uint32_t max_probes;
     uint32_t batch_size; //kernel batch size;
 
+    //utility / cheap bitmask index
     __host__ __device__
-    size_t index(size_t hash)const noexcept{
+    size_t index(uint64_t hash)const noexcept{
         return hash & mask;
+    }
+    //device safe: controll if valid pointer set
+    __host__ __device__
+    bool valid()const noexcept{
+        return keys!=nullptr 
+            && values!=nullptr
+            && hashes!=nullptr
+            && flags!=nullptr;
     }
 };
 
@@ -51,3 +61,7 @@ inline size_t total_bytes(size_t capacity){
         +hashes_bytes(capacity)
         +flags_bytes(capacity);
 }
+//explicit api declaration
+// (impl in layout.cu)
+SoALayout allocate_soa(size_t capacity,unint32_t max_probes,uint32_t batch_size);
+void free_soa(SoALayout& t);
