@@ -1,4 +1,4 @@
-#include "include/storage/layout.h"
+#include "include/gpu_engine/storage/layout.h"
 #include <cuda_runtime.h>
 #include <stdexcept>
 

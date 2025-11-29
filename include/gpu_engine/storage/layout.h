@@ -63,5 +63,5 @@ inline size_t total_bytes(size_t capacity){
 }
 //explicit api declaration
 // (impl in layout.cu)
-SoALayout allocate_soa(size_t capacity,unint32_t max_probes,uint32_t batch_size);
+SoALayout allocate_soa(size_t capacity,uint32_t max_probes,uint32_t batch_size);
 void free_soa(SoALayout& t);
