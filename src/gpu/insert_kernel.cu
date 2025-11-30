@@ -21,12 +21,15 @@ HOST_DEVICE static inline uint64_t load_u64_aligned(const uint8_t* p)
 {
     return *reinterpret_cast<const uint64_t*>(p);
 }
+
 //fast 64bit store for aligned memory
 HOST_DEVICE static inline void store_u64_aligned(uint8_t* p,uint64_t v)
 {
     *reinterpret_cast<uint64_t*>(p)=v;
 }
+
 //copy key_size bytes from src to dst using 8-bytes stores 
+
 HOST_DEVICE static inline void copy_key_aligned(uint8_t* dst,const uint8_t* v)
 {
     constexpr size_t W=8;
@@ -47,6 +50,7 @@ HOST_DEVICE static inline void copy_key_aligned(uint8_t* dst,const uint8_t* v)
         for(size_t i=0;i<tail;++i) dst[base+i]=src[base+i];
     }
 }
+
 //copy VALUE_SIZE bytes 
 HOST_DEVICE static inline void copy_value_aligned(uint8_t* dst,const uint8_t* src)
 {
@@ -91,7 +95,7 @@ HOST_DEVICE static inline bool dev_key_equals_aligned(const uint8_t* a,const uin
     return true;
 }
 
-__global__ static void kernel__insert__batch(SoALayout table,
+__global__ static void kernel_insert_batch(SoALayout table,
                                              const uint8_t* keys_dev,
                                              const uint8_t* vals_dev,
                                              const uint64_t* hashes_dev,
