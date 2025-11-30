@@ -27,12 +27,12 @@ HOST_DEVICE static inline void store_u64_aligned(uint8_t* p,uint64_t v)
     *reinterpret_cast<uint64_t*>(p)=v;
 }
 //copy key_size bytes from src to dst using 8-bytes stores 
-HOST_DEVICE static inline void copy_key_aligned(uint8_t* dst,const uint8_t v)
+HOST_DEVICE static inline void copy_key_aligned(uint8_t* dst,const uint8_t* v)
 {
     constexpr size_t W=8;
     constexpr size_t WORDS=KEY_SIZE/W;
     const uint64_t* s=reinterpret_cast<const uint64_t*>(src);
-    uint64_t* d=reinterpret_cast<uint64_t*>
+    uint64_t* d=reinterpret_cast<uint64_t*>(dst);
 
 #pragma unroll
     for(size_t i=0;i<WORDS;++i)
@@ -137,7 +137,7 @@ __global__ static void kernel__insert__batch(SoALayout table,
         //2nd Case sloty busy - check duplicate/update
         //we check if matches our hash. even if writing we can speculatively check hash
         //but strictly we should only check key if filled
-        if(prve==SLOT_FILLED)
+        if(prev==SLOT_FILLED)
         {
             uint64_t stored_hash=table.hashes[idx];
             if(stored_hash==h)
@@ -150,7 +150,7 @@ __global__ static void kernel__insert__batch(SoALayout table,
                     copy_value_aligned(dst_val,val_ptr);
                     //Ensure write visible
                     __threadfence();
-                    local_status=INSERT_UPDATED;
+                    local_status=INSERT_OVERWRITE;
                     break;
                 }
             }
@@ -183,11 +183,11 @@ namespace gpu{
     if(n==0)return;
     const int block=256;
     int grid=(int)((n+block-1)/block);
-    kernel__insert__batch<<<grid,block,0,stream>>>(table,keys_dev,vals_dev,hashes_dev,status_dev,n);
+    kernel_insert_batch<<<grid,block,0,stream>>>(table,keys_dev,vals_dev,hashes_dev,status_dev,n);
     cudaError_t err=cudaGetLastError();
     if(err!=cudaSuccess)
     {
-        throw std::runtime_error(std::string("kernel__insert__batch launch failed: ")+cudaGetErrorString(err));
+        throw std::runtime_error(std::string("kernel_insert_batch launch failed: ")+cudaGetErrorString(err));
     }
     //opt sync here or leave to caller
     cuda_check(cudaStreamSynchronize(stream),"batch_insert_dev stream sync failed");
