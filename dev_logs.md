@@ -19,3 +19,8 @@ layout.cu -> assuming calls will succed , need's a wrapper for checking correctl
 right now now thread safe even though gpu kernels run in streams , host side allocator must be protected. 
 
 Goals for now : 0 Fragmentations.
+
+HashRouter: cpu side orchestrator. Managing staging bufferss to keep the data flowing smothly
+hash_router.h: API used by server/client
+hash_router.cpp: impl managing pinned memory and device staging buffers
+using cudaMallocHost vs malloc where os can swap that part of memory to disk , so with malloc gpu cannot access it directly losing time to copy to a temp buffer first, instead using cudaMallocHost os promises to never move this memory so gpu can read at full PCIe speed 
