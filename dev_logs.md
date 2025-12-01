@@ -24,3 +24,36 @@ HashRouter: cpu side orchestrator. Managing staging bufferss to keep the data fl
 hash_router.h: API used by server/client
 hash_router.cpp: impl managing pinned memory and device staging buffers
 using cudaMallocHost vs malloc where os can swap that part of memory to disk , so with malloc gpu cannot access it directly losing time to copy to a temp buffer first, instead using cudaMallocHost os promises to never move this memory so gpu can read at full PCIe speed 
+
+FIRST RUN ON LOCAL: 
+[INIT] Starting GPU Engine...
+[Init] Allocating SoA Table (2097152 slots)...
+[Init] Creating HashRouter...
+
+--- Batch 1 / 5 ---
+PUT: 2000000 items in 60.1884 ms (33 M ops/sec)
+GET: Retrieved in 52.7344 ms (37 M ops/sec)
+VALIDATION: 0 / 2000000 match correctly.
+
+--- Batch 2 / 5 ---
+PUT: 2000000 items in 40.2241 ms (49 M ops/sec)
+GET: Retrieved in 49.1885 ms (40 M ops/sec)
+VALIDATION: 1999972 / 2000000 match correctly.
+
+--- Batch 3 / 5 ---
+PUT: 2000000 items in 40.3857 ms (49 M ops/sec)
+GET: Retrieved in 50.8257 ms (39 M ops/sec)
+VALIDATION: 1999972 / 2000000 match correctly.
+
+--- Batch 4 / 5 ---
+PUT: 2000000 items in 46.0007 ms (43 M ops/sec)
+GET: Retrieved in 50.1192 ms (39 M ops/sec)
+VALIDATION: 1999972 / 2000000 match correctly.
+
+--- Batch 5 / 5 ---
+PUT: 2000000 items in 39.8104 ms (50 M ops/sec)
+GET: Retrieved in 49.9526 ms (40 M ops/sec)
+VALIDATION: 1999972 / 2000000 match correctly.
+
+[Done] Total time: 1.47397s 
+It took a few tweaks upgrades of cuda and downgrades so the flags need to be revied completly for compatibility. and also the sync at put and get of cuda, commenting out those lines at kernel , doubled the performance of the engine
