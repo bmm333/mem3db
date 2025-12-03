@@ -63,5 +63,13 @@ notice: batch  1  should be considered as a warmup round instead when not using 
 
 
 Trying: Removing PCIe from equation to see the real speed when data is already on GPU.
-
-
+Result: [Info] Table Allocated in VRAM.
+[Info] Generating 4194304 items directly on GPU...
+[Run] Benchmarking INSERT...
+>>> INSERT: 34.6266 ms | 121.13 M ops/sec | 31.0092 GB/s effective
+[Run] Benchmarking LOOKUP...
+>>> LOOKUP: 30.6135 ms | 137.008 M ops/sec | 35.0741 GB/s effective
+i could push this even further , linear probing is stalling currently : having wrap divergence -> Thread A finds an empty slot and takes it , Thread B collides and has to loop like 50 times , Whole Wrap is waiting for Thread B . And The memory Stalls because every probe is a random memory read.
+A solution to this could be : Instead of having 1 slot per hash , using a bucket 8 slots per hash known as Bucketized/Cuckoo
+But again , this might seem slower than other published papers, but those published benchmarks usually run 4/8 byte Key + 8 Byte value so they have a payload of 16byte so ofc they hit 1B op/s which is bascially 16GB/s Bandwith.
+Instead im running 256 Payload , and with 137m op/s im at 40% of the theorical physical limit of my card (3060ti)
