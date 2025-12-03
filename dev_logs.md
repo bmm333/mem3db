@@ -55,7 +55,13 @@ PUT: 2000000 items in 39.8104 ms (50 M ops/sec)
 GET: Retrieved in 49.9526 ms (40 M ops/sec)
 VALIDATION: 1999972 / 2000000 match correctly.
 
+
 [Done] Total time: 1.47397s 
 It took a few tweaks upgrades of cuda and downgrades so the flags need to be revied completly for compatibility. and also the sync at put and get of cuda, commenting out those lines at kernel , doubled the performance of the engine
 
 notice: batch  1  should be considered as a warmup round instead when not using sync on put/get 
+
+
+Trying: Removing PCIe from equation to see the real speed when data is already on GPU.
+
+
