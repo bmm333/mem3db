@@ -73,3 +73,6 @@ i could push this even further , linear probing is stalling currently : having w
 A solution to this could be : Instead of having 1 slot per hash , using a bucket 8 slots per hash known as Bucketized/Cuckoo
 But again , this might seem slower than other published papers, but those published benchmarks usually run 4/8 byte Key + 8 Byte value so they have a payload of 16byte so ofc they hit 1B op/s which is bascially 16GB/s Bandwith.
 Instead im running 256 Payload , and with 137m op/s im at 40% of the theorical physical limit of my card (3060ti)
+
+
+6.2.6.2 Write-Combining Memory <----
