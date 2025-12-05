@@ -24,7 +24,3 @@ HashRouter: cpu side orchestrator. Managing staging bufferss to keep the data fl
 hash_router.h: API used by server/client
 hash_router.cpp: impl managing pinned memory and device staging buffers
 using cudaMallocHost vs malloc where os can swap that part of memory to disk , so with malloc gpu cannot access it directly losing time to copy to a temp buffer first, instead using cudaMallocHost os promises to never move this memory so gpu can read at full PCIe speed 
-
-Anyway continuing with development:
-    --Adding Vector Similarity Search. This update will affect the purpouse of values array. Instead of treating them just like "bytes" we will treat them as vectors of floats, since we have 128bytes VECTOR_SIZE it corresponds directly to 32 floats 
-    --To support this will implement a Brute force cosine Similarity kernel: yes brute force still is going to be way more accurate in way less time than more complex approximative algorithm's such as HNSW
