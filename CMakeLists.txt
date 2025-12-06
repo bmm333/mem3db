@@ -40,6 +40,7 @@ add_library(inmemdb SHARED
     src/gpu/hash_kernel.cu
     src/gpu/insert_kernel.cu
     src/gpu/lookup_kernel.cu
+    src/gpu/vector_ops.cu
     
     # CPU Router / Execution
     src/execution/hash_router.cpp

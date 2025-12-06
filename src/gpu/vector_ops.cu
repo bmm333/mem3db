@@ -4,7 +4,12 @@
 
 namespace gpu{
     //128bytes=32floats
-    static constexpr int FLOATS_PER_VECTOR=32;
+    //using float4 so 32 floats/4 = 8 iterations
+    static constexpr int FLOATS_PER_VECTOR=8;
+
+    //constants from layout
+    static constexpr uint32_t SLOT_FILLED=2u;
+
     //KERNEL DOT PRODUCT
     __global__ void kernel_dot_product(SoALayout table, 
                                    const float* __restrict__ query, 
@@ -14,25 +19,30 @@ namespace gpu{
         //1 grid stride loop
         size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) return;
+
         //2. Check if slot is occupied
-        // We only compute scores for valid data
-        // Note: table.flags is uint32_t now based on previous steps
         if (table.flags[idx] != 2) { // 2 = SLOT_FILLED
-            scores[idx] = -1000000.0f; // Negative infinity for empty slots
+            scores[idx] = -1e30f; // Negative infinity for empty slots
             return;
         } 
-        // 3. Pointers to data
-        // table.values is uint8_t*, cast to float*
-        const float* my_vector = reinterpret_cast<const float*>(table.values + (idx * VALUE_SIZE));
+        // 3. Pointers Setyo (Vectorized)
+        // Cast the byte pointer to float4* to load 16 bytes at a time
+        const float4* my_vec = reinterpret_cast<const float4*>(table.values + (idx * VALUE_SIZE));
+        const float4* q_vec  = reinterpret_cast<const float4*>(query);
 
         // 4. Compute Dot Product
         float dot = 0.0f;
         
         // Unroll for speed. 
-        // Optimization: In production, we use float4 vector types for 128-bit loads.
         #pragma unroll
-        for (int i = 0; i < FLOATS_PER_VECTOR; ++i) {
-            dot += my_vector[i] * query[i];
+        for (int i = 0; i < VECTORS_PER_ITEM; ++i) {
+            float4 v = my_vec[i]; // Load 16 bytes from VRAM
+            float4 q = q_vec[i];  // Load 16 bytes from Global (Cached in L1)
+            
+            dot += v.x * q.x;
+            dot += v.y * q.y;
+            dot += v.z * q.z;
+            dot += v.w * q.w;
         }
         // 5. Store Score
         scores[idx] = dot;

@@ -8,7 +8,7 @@ namespace gpu{
     struct SearchResult{
         float score;      //Similarity score
         uint64_t id;     //Vector ID
-    }
+    };
 
     
     / Calculate Dot Product of a query vector against ALL items in the table
